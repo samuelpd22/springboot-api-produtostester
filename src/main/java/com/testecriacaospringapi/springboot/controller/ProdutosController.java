@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 public class ProdutosController {
 
@@ -29,7 +32,14 @@ public class ProdutosController {
     }
     @GetMapping("/produtos") // VAI PEGAR OS PROTUDOS
     public ResponseEntity<List<ProdutosModelo>> pegaTodosProdutos(){
-        return ResponseEntity.status(HttpStatus.OK).body(produtosRepositorio.findAll());
+        List<ProdutosModelo> listaprodutos = produtosRepositorio.findAll();
+        if(!listaprodutos.isEmpty()){
+            for (ProdutosModelo produto : listaprodutos){
+                UUID id = produto.getIdProduto();
+                produto.add(linkTo(methodOn(ProdutosController.class).pegarPorId(id)).withSelfRel());
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(listaprodutos);
     }
     @GetMapping("/produtos/{id}") // VAI PEGAR OS PRODUTOS PELO ID
     public ResponseEntity<Object> pegarPorId(@PathVariable(value = "id")UUID id){
@@ -37,6 +47,7 @@ public class ProdutosController {
         if(produtoid.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado");
         }
+        produtoid.get().add(linkTo(methodOn(ProdutosController.class).pegaTodosProdutos()).withSelfRel());
         return ResponseEntity.status(HttpStatus.OK).body(produtoid.get());
     }
 

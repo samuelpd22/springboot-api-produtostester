@@ -1,6 +1,7 @@
 package com.testecriacaospringapi.springboot.entity;
 
 import jakarta.persistence.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -10,7 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Table (name = "SAM-Produtos")
-public class ProdutosModelo implements Serializable {
+public class ProdutosModelo extends RepresentationModel<ProdutosModelo> implements Serializable {
 
 
     private static final long seriaVersionUID = 1L;
